@@ -34,7 +34,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalVehicles, setTotalVehicles] = useState(0);
-  const [limit] = useState(10); // Fixed limit per page
+  const [limit] = useState(1000); // Fixed limit per page
 
   useEffect(() => {
     const fetchData = async () => {

@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     console.log('Handling /api/vehicles request...');
 
     if (req.method === "GET") {
-      const { page = 1, limit = 10 } = req.query;
+      const { page = 1, limit = 1000 } = req.query;
       const skip = (page - 1) * limit;
 
       console.log(`Fetching vehicles - Page: ${page}, Limit: ${limit}`);
