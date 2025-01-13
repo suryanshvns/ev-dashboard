@@ -32,13 +32,17 @@ ChartJS.register(
 const Dashboard = () => {
   const [vehicleData, setVehicleData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalVehicles, setTotalVehicles] = useState(0);
+  const [limit] = useState(10); // Fixed limit per page
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('/api/vehicles');
-        setVehicleData(response.data);
+        const response = await axios.get(`/api/vehicles?page=${page}&limit=${limit}`);
+        setVehicleData((prevData) => [...prevData, ...response.data.vehicles]);
+        setTotalVehicles(response.data.totalVehicles); // Set the total vehicle count for pagination
       } catch (error) {
         console.error('Error fetching vehicle data:', error);
       } finally {
@@ -47,7 +51,14 @@ const Dashboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [page, limit]);
+
+  // Handle "Load More" button click
+  const loadMoreData = () => {
+    if (vehicleData.length < totalVehicles) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
 
   return (
     <div className={styles.dashboardContainer}>
@@ -70,6 +81,13 @@ const Dashboard = () => {
       <div className={styles.tableContainer}>
         <div className={styles.chartTitle}>Table of Electric Vehicles</div>
         <DataTableComponent data={vehicleData} />
+        {vehicleData.length < totalVehicles && (
+          <div className={styles.loadMoreButtonContainer}>
+            <button onClick={loadMoreData} className={styles.loadMoreButton}>
+              Load More
+            </button>
+          </div>
+        )}
       </div>
       <Footer />
     </div>

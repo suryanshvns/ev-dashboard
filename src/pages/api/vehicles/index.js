@@ -3,19 +3,35 @@ import Vehicle from "../../../models/Vehicle";
 
 export default async function handler(req, res) {
   try {
-    await connectToDatabase(); // Connect to the database
+    await connectToDatabase();
+
+    console.log('Handling /api/vehicles request...');
 
     if (req.method === "GET") {
-      // Fetch all vehicles from the database
-      const vehicles = await Vehicle.find({});
-      return res.status(200).json(vehicles);
+      const { page = 1, limit = 10 } = req.query;
+      const skip = (page - 1) * limit;
+
+      console.log(`Fetching vehicles - Page: ${page}, Limit: ${limit}`);
+
+      const start = Date.now();
+
+      // Get total count of vehicles for pagination
+      const totalVehicles = await Vehicle.countDocuments({});
+      const vehicles = await Vehicle.find({})
+        .skip(skip)
+        .limit(Number(limit));
+
+      console.log(`Query execution time: ${Date.now() - start}ms`);
+
+      return res.status(200).json({
+        vehicles,
+        totalVehicles,  // Include the total count of vehicles in the response
+      });
     } else {
-      // If method is not GET, return 405 Method Not Allowed
       res.setHeader("Allow", ["GET"]);
       return res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } catch (error) {
-    // Handle any error that occurs during the database connection or query
     console.error("Database connection or query error:", error);
     return res.status(500).json({ error: "Failed to fetch data" });
   }
