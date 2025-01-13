@@ -12,11 +12,7 @@ async function uploadCSV() {
     });
 
     console.log("Connected to MongoDB");
-
-    // Update this path to the actual location of your CSV file
     const jsonArray = await csvtojson().fromFile("../data/vehicles.csv");
-    
-    // Insert the data into the MongoDB collection
     await Vehicle.insertMany(jsonArray);
 
     console.log("CSV data uploaded successfully!");
